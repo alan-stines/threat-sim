@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Middle Georgia State University - Cyber Threat Simulator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/images/mga-logo.png">
+</head>
+<body>
+
+  <!-- Viewport Background Canvases -->
+  <div id="viewport-container">
+    <div id="globe-viewport"></div>
+    <div id="map2d-viewport" class="hidden"></div>
+  </div>
+
+  <!-- Sci-Fi Visual Overlays -->
+  <div class="scanline-overlay"></div>
+  <div class="vignette-overlay"></div>
+
+  <!-- HUD Interface Layer -->
+  <div class="hud-layer">
+
+    <!-- Header Navigation & Status -->
+    <header class="hud-panel hud-header interactive">
+      <div class="header-left">
+        <img src="assets/images/mga-logo.png" alt="Middle Georgia State University" class="mga-logo">
+        <div class="brand-divider"></div>
+        <div class="brand-title">
+          <div class="pulse-dot"></div>
+          <div class="mga-title-box">
+            <span class="mga-univ-name">MIDDLE GEORGIA STATE UNIVERSITY</span>
+            <span class="mga-sub-name">CYBER THREAT SIMULATION CENTER</span>
+          </div>
+        </div>
+        <div class="status-tag">● MGA DEFENSE ACTIVE</div>
+      </div>
+
+      <div class="header-center">
+        <div class="clock-item">
+          <span>UTC:</span>
+          <div id="clock-utc">00:00:00 UTC</div>
+        </div>
+        <div class="clock-item">
+          <span>UPTIME:</span>
+          <div id="clock-uptime">00:00:00</div>
+        </div>
+        <div class="aps-metric">
+          <span>APS:</span>
+          <div id="metric-aps" class="aps-val">0.0</div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- View Toggle -->
+        <button id="btn-view-3d" class="btn-tech active" title="3D Holographic Globe">🌐 3D GLOBE</button>
+        <button id="btn-view-2d" class="btn-tech" title="2D Tactical Projection">🗺️ 2D TACTICAL</button>
+
+        <!-- Auto Rotate -->
+        <button id="btn-auto-rotate" class="btn-tech active" title="Toggle Globe Auto-Rotation">🔄 ROTATE</button>
+
+        <!-- Audio -->
+        <button id="btn-audio" class="btn-tech" title="Audio Effects Synthesizer (Disabled for Performance)">🔇 AUDIO: OFF</button>
+
+        <!-- Speed Presets -->
+        <div style="display:flex; gap:3px;">
+          <button id="speed-pause" class="btn-tech" title="Pause Simulation">⏸</button>
+          <button id="speed-1x" class="btn-tech active" title="1x Normal Speed">1X</button>
+          <button id="speed-2x" class="btn-tech" title="2x High Speed">2X</button>
+          <button id="speed-5x" class="btn-tech" title="5x Blitz Speed">5X</button>
+          <button id="speed-war" class="btn-tech btn-danger" title="Trigger Cyber War Storm">⚡ CYBER WAR</button>
+        </div>
+
+        <!-- Fullscreen -->
+        <button id="btn-fullscreen" class="btn-tech" title="Toggle Fullscreen">⛶ FULLSCREEN</button>
+      </div>
+    </header>
+
+    <!-- Main Body HUD (Sidebars) -->
+    <div class="hud-body">
+
+      <!-- Left Sidebar: Global Metrics & Leaderboards -->
+      <aside class="sidebar-left interactive">
+
+        <!-- Total Attacks Card -->
+        <section class="hud-panel panel-section">
+          <div class="section-title">GLOBAL THREAT VELOCITY</div>
+          <div class="counter-box">
+            <div id="metric-total-attacks" class="counter-number">0</div>
+            <div class="counter-sub">TOTAL DETECTED ATTACKS</div>
+          </div>
+        </section>
+
+        <!-- Threat Breakdown Card -->
+        <section class="hud-panel panel-section">
+          <div class="section-title">THREAT CATEGORIES</div>
+          <div class="category-bars">
+
+            <!-- Active Attack -->
+            <div class="cat-row">
+              <div class="cat-info">
+                <span class="cat-label">
+                  <span class="cat-dot" style="background:var(--color-attack)"></span>
+                  Active Attacks
+                </span>
+                <span id="count-attack">0 (0%)</span>
+              </div>
+              <div class="bar-track">
+                <div id="bar-attack" class="bar-fill" style="width:0%; background:var(--color-attack)"></div>
+              </div>
+            </div>
+
+            <!-- Malware -->
+            <div class="cat-row">
+              <div class="cat-info">
+                <span class="cat-label">
+                  <span class="cat-dot" style="background:var(--color-malware)"></span>
+                  Malware / Trojans
+                </span>
+                <span id="count-malware">0 (0%)</span>
+              </div>
+              <div class="bar-track">
+                <div id="bar-malware" class="bar-fill" style="width:0%; background:var(--color-malware)"></div>
+              </div>
+            </div>
+
+            <!-- Spam -->
+            <div class="cat-row">
+              <div class="cat-info">
+                <span class="cat-label">
+                  <span class="cat-dot" style="background:var(--color-spam)"></span>
+                  Spam / Phishing
+                </span>
+                <span id="count-spam">0 (0%)</span>
+              </div>
+              <div class="bar-track">
+                <div id="bar-spam" class="bar-fill" style="width:0%; background:var(--color-spam)"></div>
+              </div>
+            </div>
+
+            <!-- Ransomware -->
+            <div class="cat-row">
+              <div class="cat-info">
+                <span class="cat-label">
+                  <span class="cat-dot" style="background:var(--color-ransomware)"></span>
+                  Ransomware
+                </span>
+                <span id="count-ransomware">0 (0%)</span>
+              </div>
+              <div class="bar-track">
+                <div id="bar-ransomware" class="bar-fill" style="width:0%; background:var(--color-ransomware)"></div>
+              </div>
+            </div>
+
+            <!-- DDoS -->
+            <div class="cat-row">
+              <div class="cat-info">
+                <span class="cat-label">
+                  <span class="cat-dot" style="background:var(--color-ddos)"></span>
+                  DDoS Floods
+                </span>
+                <span id="count-ddos">0 (0%)</span>
+              </div>
+              <div class="bar-track">
+                <div id="bar-ddos" class="bar-fill" style="width:0%; background:var(--color-ddos)"></div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Top Attacking Nations -->
+        <section class="hud-panel panel-section">
+          <div class="section-title">TOP ATTACKING SOURCES</div>
+          <div id="list-top-attackers" class="country-rank-list">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+        <!-- Top Targeted Nations -->
+        <section class="hud-panel panel-section">
+          <div class="section-title">TOP TARGETED NATIONS</div>
+          <div id="list-top-victims" class="country-rank-list">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- Right Sidebar: Country Intelligence & Threat Advisory -->
+      <aside class="sidebar-right interactive">
+
+        <!-- Country Intelligence Inspector -->
+        <section class="hud-panel panel-section">
+          <div class="section-title">TARGET NATION INTELLIGENCE</div>
+
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <div id="intel-flag" style="font-size:28px;">🇺🇸</div>
+            <div>
+              <div id="intel-name" style="font-size:14px; font-weight:bold; color:#fff;">United States</div>
+              <div id="intel-city" style="font-size:11px; color:var(--text-secondary);">Washington, D.C.</div>
+            </div>
+          </div>
+
+          <!-- Shield Health -->
+          <div class="shield-container">
+            <div class="shield-header">
+              <span style="color:var(--text-muted)">SHIELD INTEGRITY:</span>
+              <span id="intel-shield-val" style="color:var(--color-cyan); font-weight:bold;">100%</span>
+            </div>
+            <div class="shield-bar-track">
+              <div id="intel-shield-fill" class="shield-bar-fill" style="width:100%"></div>
+            </div>
+          </div>
+
+          <div class="intel-grid">
+            <div class="intel-tile">
+              <div class="intel-tile-label">INBOUND THREATS</div>
+              <div id="intel-inbound" class="intel-tile-val" style="color:var(--color-attack)">0</div>
+            </div>
+            <div class="intel-tile">
+              <div class="intel-tile-label">OUTBOUND PROBES</div>
+              <div id="intel-outbound" class="intel-tile-val" style="color:var(--color-cyan)">0</div>
+            </div>
+            <div class="intel-tile">
+              <div class="intel-tile-label">DOMINANT VECTOR</div>
+              <div id="intel-threat" class="intel-tile-val" style="font-size:11px;">Active Attack</div>
+            </div>
+            <div class="intel-tile">
+              <div class="intel-tile-label">TARGETED PORT</div>
+              <div id="intel-port" class="intel-tile-val" style="color:var(--color-spam)">443</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:6px; margin-top:12px;">
+            <button id="btn-focus-country" class="btn-tech" style="flex:1;">🎯 FOCUS CAMERA</button>
+            <button id="btn-ddos-country" class="btn-tech btn-danger" style="flex:1;">⚡ SWARM TARGET</button>
+          </div>
+        </section>
+
+        <!-- Threat Advisory Bulletin -->
+        <section class="hud-panel panel-section">
+          <div class="section-title">GLOBAL THREAT BULLETINS</div>
+
+          <div class="advisory-item">
+            <div class="advisory-title">CRITICAL: CVE-2024-21762</div>
+            <div class="advisory-meta">SSL-VPN Remote Code Execution surge detected across telecommunications and cloud gateways.</div>
+          </div>
+
+          <div class="advisory-item" style="border-left-color: var(--color-ransomware);">
+            <div class="advisory-title">RANSOMWARE: LockBit 3.0</div>
+            <div class="advisory-meta">Automated lateral movement via SMB and Active Directory admin shares observed in financial sectors.</div>
+          </div>
+
+          <div class="advisory-item" style="border-left-color: var(--color-ddos);">
+            <div class="advisory-title">VOLUMETRIC: 480 Gbps Surge</div>
+            <div class="advisory-meta">HTTP/2 Rapid Reset and SYN flood vectors targeting root DNS nameservers.</div>
+          </div>
+        </section>
+
+      </aside>
+
+    </div>
+
+    <!-- Bottom Panel: Live Attack Stream Console -->
+    <footer class="hud-panel hud-footer interactive">
+      <div class="stream-header">
+        <div class="stream-title">
+          <span>⚡ LIVE CYBER ATTACK TELEMETRY FEED</span>
+        </div>
+        <div class="filter-group">
+          <button class="btn-filter active" data-filter="all">ALL (LIVE)</button>
+          <button class="btn-filter" data-filter="attack">ATTACKS</button>
+          <button class="btn-filter" data-filter="malware">MALWARE</button>
+          <button class="btn-filter" data-filter="spam">SPAM</button>
+          <button class="btn-filter" data-filter="ransomware">RANSOMWARE</button>
+          <button class="btn-filter" data-filter="ddos">DDOS</button>
+        </div>
+      </div>
+
+      <div class="stream-table-container">
+        <table class="stream-table">
+          <thead>
+            <tr>
+              <th style="width:100px;">TIMESTAMP</th>
+              <th style="width:230px;">ATTACKER (SOURCE)</th>
+              <th style="width:230px;">VICTIM (TARGET)</th>
+              <th>THREAT VECTOR / PAYLOAD</th>
+              <th style="width:170px;">PORT / SERVICE</th>
+              <th style="width:90px;">SEVERITY</th>
+            </tr>
+          </thead>
+          <tbody id="stream-table-body">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Bundled Local Vendor Scripts (100% Offline) -->
+  <script src="assets/vendor/three.bundle.js"></script>
+
+  <!-- Application Modules -->
+  <script src="js/world-data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/simulation.js"></script>
+  <script src="js/globe-renderer.js"></script>
+  <script src="js/map2d-renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

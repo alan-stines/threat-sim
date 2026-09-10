@@ -1,0 +1,15 @@
+[Unit]
+Description=Cyber Threat Simulation Map Server
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/threat-sim
+ExecStart=/usr/bin/node /home/pi/threat-sim/server.js
+Restart=on-failure
+RestartSec=5
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
