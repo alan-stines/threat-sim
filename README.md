@@ -12,7 +12,10 @@ A high-tech cyber threat simulation map branded for **Middle Georgia State Unive
 Double-click `start.bat` in the project folder. It will launch the local static server and automatically open your default web browser to `http://localhost:3000`.
 
 ### Option 2: Raspberry Pi (SOC / NOC Kiosk Display)
-1. Run the dependency installer on your Raspberry Pi:
+Node.js is the only JavaScript runtime requirement; this project has no npm
+dependencies. You do not need to run `npm install` on the Pi.
+
+1. Run the offline prerequisite check on your Raspberry Pi:
    ```bash
    chmod +x install-pi.sh start-pi.sh
    ./install-pi.sh
@@ -28,6 +31,24 @@ Double-click `start.bat` in the project folder. It will launch the local static 
    ```bash
    ./start-pi.sh autostart
    ```
+
+The check never runs APT or npm and never downloads anything. Missing OS
+packages must be supplied from offline media, including dependencies.
+
+Pi browser launches run the server and a dedicated Chromium profile inside a
+private network namespace with only loopback enabled. There is no external
+network interface or Internet route. The launcher stops if the OS does not
+allow unprivileged user/network namespaces; it does not fall back to a connected
+browser. Chromium background networking, updates, sync, and extensions are
+also disabled. Other applications and OS services are outside this isolation.
+Disconnect Ethernet and Wi-Fi if the entire Pi must stay off the network.
+
+The isolated server cannot be accessed from another browser outside its
+namespace, including in `headless` mode. Direct `node server.js` and the
+systemd server listen on loopback only, but opening an ordinary browser does
+not apply the Pi launcher's browser isolation. Use `./start-pi.sh desktop`
+for an isolated browser window, or `./start-pi.sh 2d` for kiosk mode.
+Close kiosk mode with **Alt+F4**; Esc does not exit Chromium kiosk mode.
 
 ### Option 3: Command Line (Node.js)
 ```bash

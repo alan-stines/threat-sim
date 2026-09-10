@@ -59,7 +59,7 @@ start_server() {
   # Wait for server to be responsive
   echo -e "${YELLOW}Waiting for server to become ready...${NC}"
   for i in {1..30}; do
-    if curl -s "http://localhost:$PORT" &> /dev/null; then
+    if curl --noproxy '*' -fsS "http://127.0.0.1:$PORT" &> /dev/null; then
       echo -e "${GREEN}[OK] Server is active at http://localhost:$PORT${NC}"
       return 0
     fi
@@ -142,19 +142,46 @@ if [ -z "$MODE" ]; then
   esac
 fi
 
+# Run the browser and server with only a private loopback interface. Chromium
+# flags alone do not guarantee that background services stay off the network.
+if [ "${THREATSIM_NET_ISOLATED:-}" != "1" ]; then
+  for dependency in unshare ip node curl; do
+    if ! command -v "$dependency" &> /dev/null; then
+      echo "[ERROR] Offline launch requires '$dependency' to be installed locally." >&2
+      exit 1
+    fi
+  done
+  if ! unshare --user --map-current-user --net -- bash -c 'ip link set lo up'; then
+    echo "[ERROR] This OS does not allow an isolated network namespace. Offline launch stopped." >&2
+    exit 1
+  fi
+  exec unshare --user --map-current-user --net -- bash -c '
+    ip link set lo up || exit 1
+    export THREATSIM_NET_ISOLATED=1
+    exec bash "$1" "$2"
+  ' bash "$SCRIPT_DIR/start-pi.sh" "$MODE"
+fi
+
 # Start the server
 start_server
 
 # Verify Chromium is available for GUI modes
 if [[ "$MODE" != "headless" && -z "$CHROMIUM_BIN" ]]; then
   echo -e "${YELLOW}Warning: Chromium browser not found. Running in headless mode.${NC}"
-  echo -e "Open http://localhost:$PORT in any browser on your network."
+  echo -e "The server is isolated; browsers outside this namespace cannot access it."
   wait $SERVER_PID
   exit 0
 fi
 
 # Launch Chromium flags for Raspberry Pi
 CHROME_FLAGS=(
+  "--user-data-dir=${XDG_CONFIG_HOME:-$HOME/.config}/threatsim-chromium"
+  "--no-first-run"
+  "--disable-background-networking"
+  "--disable-component-update"
+  "--disable-sync"
+  "--disable-extensions"
+  "--no-proxy-server"
   "--noerrdialogs"
   "--disable-infobars"
   "--check-for-update-interval=31536000"
@@ -190,6 +217,7 @@ case "$MODE" in
 
   headless)
     echo -e "${GREEN}Running headless. Server available at http://localhost:$PORT${NC}"
+    echo "This address is private to the isolated network namespace."
     echo -e "Press Ctrl+C to stop."
     wait $SERVER_PID
     ;;

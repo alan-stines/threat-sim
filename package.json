@@ -1,20 +1,16 @@
 {
   "name": "threat-sim",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Middle Georgia State University - Cyber Threat Simulator",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "three": "^0.186.0"
-  },
-  "devDependencies": {
-    "esbuild": "^0.28.2"
-  }
+  "keywords": [
+    "threat-sim",
+    "cyber-security",
+    "mga"
+  ],
+  "author": "Middle Georgia State University",
+  "license": "ISC"
 }
