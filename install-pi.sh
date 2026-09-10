@@ -3,7 +3,7 @@
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 missing=0
-for dependency in node curl unshare ip; do
+for dependency in node curl; do
   if ! command -v "$dependency" >/dev/null 2>&1; then
     echo "[MISSING] $dependency"
     missing=1
@@ -15,14 +15,10 @@ if ! command -v chromium >/dev/null 2>&1 && ! command -v chromium-browser >/dev/
 fi
 if [ "$missing" -ne 0 ]; then
   echo "Supply the missing OS packages from offline media (including their dependencies)."
-  echo "Node.js, Chromium, curl, util-linux (unshare), and iproute2 (ip) are required."
+  echo "Node.js, Chromium, and curl are required."
   exit 1
 fi
 node --version
-if ! unshare --user --map-current-user --net -- bash -c 'ip link set lo up'; then
-  echo "[ERROR] The OS must allow unprivileged user and network namespaces."
-  exit 1
-fi
-chmod +x "$SCRIPT_DIR/start-pi.sh"
 echo "[OK] Offline prerequisites available. No packages were downloaded."
-echo "Run ./start-pi.sh 2d or ./start-pi.sh desktop. Use Alt+F4 to close kiosk mode."
+echo "Disable Wi-Fi and unplug Ethernet for strictly offline operation."
+echo "Run bash start-pi.sh 2d or bash start-pi.sh desktop. Use Alt+F4 to close kiosk mode."

@@ -35,19 +35,15 @@ dependencies. You do not need to run `npm install` on the Pi.
 The check never runs APT or npm and never downloads anything. Missing OS
 packages must be supplied from offline media, including dependencies.
 
-Pi browser launches run the server and a dedicated Chromium profile inside a
-private network namespace with only loopback enabled. There is no external
-network interface or Internet route. The launcher stops if the OS does not
-allow unprivileged user/network namespaces; it does not fall back to a connected
-browser. Chromium background networking, updates, sync, and extensions are
-also disabled. Other applications and OS services are outside this isolation.
-Disconnect Ethernet and Wi-Fi if the entire Pi must stay off the network.
+Pi browser launches use a dedicated Chromium profile with background networking,
+updates, sync, and extensions disabled. These settings are not a network firewall.
+**Disable Wi-Fi and unplug Ethernet before launch to guarantee offline operation.**
+The app's assets are bundled locally and the server listens on loopback only.
+No user or network namespace permissions are required.
 
-The isolated server cannot be accessed from another browser outside its
-namespace, including in `headless` mode. Direct `node server.js` and the
-systemd server listen on loopback only, but opening an ordinary browser does
-not apply the Pi launcher's browser isolation. Use `./start-pi.sh desktop`
-for an isolated browser window, or `./start-pi.sh 2d` for kiosk mode.
+Use `bash start-pi.sh desktop` for a browser window, or `bash start-pi.sh 2d`
+for kiosk mode. Run the scripts as your normal desktop user, without sudo.
+Using `bash` also avoids executable-bit errors on removable media.
 Close kiosk mode with **Alt+F4**; Esc does not exit Chromium kiosk mode.
 
 ### Option 3: Command Line (Node.js)

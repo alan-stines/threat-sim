@@ -35,7 +35,7 @@ setup_autostart() {
 Type=Application
 Name=Cyber Threat Sim Map
 Comment=Full Screen Cyber Threat Simulation Map
-Exec=$SCRIPT_DIR/start-pi.sh kiosk
+Exec=bash "$SCRIPT_DIR/start-pi.sh" kiosk
 Terminal=false
 Hidden=false
 X-GNOME-Autostart-enabled=true
@@ -142,25 +142,15 @@ if [ -z "$MODE" ]; then
   esac
 fi
 
-# Run the browser and server with only a private loopback interface. Chromium
-# flags alone do not guarantee that background services stay off the network.
-if [ "${THREATSIM_NET_ISOLATED:-}" != "1" ]; then
-  for dependency in unshare ip node curl; do
-    if ! command -v "$dependency" &> /dev/null; then
-      echo "[ERROR] Offline launch requires '$dependency' to be installed locally." >&2
-      exit 1
-    fi
-  done
-  if ! unshare --user --map-current-user --net -- bash -c 'ip link set lo up'; then
-    echo "[ERROR] This OS does not allow an isolated network namespace. Offline launch stopped." >&2
+# No user/network namespace privileges are required. For guaranteed offline
+# operation, disconnect Ethernet and disable Wi-Fi before starting.
+for dependency in node curl; do
+  if ! command -v "$dependency" &> /dev/null; then
+    echo "[ERROR] Launch requires '$dependency' to be installed locally." >&2
     exit 1
   fi
-  exec unshare --user --map-current-user --net -- bash -c '
-    ip link set lo up || exit 1
-    export THREATSIM_NET_ISOLATED=1
-    exec bash "$1" "$2"
-  ' bash "$SCRIPT_DIR/start-pi.sh" "$MODE"
-fi
+done
+echo "For strictly offline operation, disable Wi-Fi and unplug Ethernet."
 
 # Start the server
 start_server
@@ -168,7 +158,7 @@ start_server
 # Verify Chromium is available for GUI modes
 if [[ "$MODE" != "headless" && -z "$CHROMIUM_BIN" ]]; then
   echo -e "${YELLOW}Warning: Chromium browser not found. Running in headless mode.${NC}"
-  echo -e "The server is isolated; browsers outside this namespace cannot access it."
+  echo -e "Open http://localhost:$PORT in a browser on this Pi."
   wait $SERVER_PID
   exit 0
 fi
@@ -217,7 +207,7 @@ case "$MODE" in
 
   headless)
     echo -e "${GREEN}Running headless. Server available at http://localhost:$PORT${NC}"
-    echo "This address is private to the isolated network namespace."
+    echo "This address is accessible only on this Pi."
     echo -e "Press Ctrl+C to stop."
     wait $SERVER_PID
     ;;
