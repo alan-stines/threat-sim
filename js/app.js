@@ -359,6 +359,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial Country Card Display
   updateCountryIntel(selectedCountry);
+  function focusMGA() {
+    selectCountry(window.WORLD_DATA.countries.find(c => c.id === 'US'));
+    globe.flyToCountry(window.WORLD_DATA.home);
+    autoRotateState = false;
+    globe.setAutoRotate(false);
+    btnAutoRotate.classList.remove('active');
+  }
+  document.getElementById('btn-focus-mga').addEventListener('click', () => {
+    btnView3d.click();
+    focusMGA();
+  });
+  focusMGA();
 
   // 9. URL Parameters (e.g. ?mode=2d, ?mode=pi, ?speed=2x, ?speed=war)
   const urlParams = new URLSearchParams(window.location.search);
@@ -375,4 +387,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 10. Start Simulation
   simulation.start();
+  const campus = new CampusDefenseMode({
+    onEnter: () => simulation.stop(),
+    onExit: () => simulation.start()
+  });
+  document.getElementById('btn-campus').addEventListener('click', () => campus.open());
+  if (urlParams.get('mode') === 'campus') campus.open();
 });

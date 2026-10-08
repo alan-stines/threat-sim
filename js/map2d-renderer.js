@@ -311,6 +311,36 @@ class Map2DRenderer {
         this.impacts.splice(i, 1);
       }
     }
+    this.drawHomeMarker();
+  }
+
+  drawHomeMarker() {
+    const { x, y } = this.latLonToXY(this.worldData.home.lat, this.worldData.home.lon);
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.strokeStyle = '#e4c6ff';
+    ctx.fillStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, 9, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + 9, y);
+    ctx.lineTo(x + 26, y - 24);
+    ctx.lineTo(x + 200, y - 24);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(12, 8, 24, .94)';
+    ctx.fillRect(x + 26, y - 67, 180, 42);
+    ctx.font = 'bold 12px Consolas, monospace';
+    ctx.fillStyle = '#e4c6ff';
+    ctx.fillText('MGA MAIN CAMPUS', x + 34, y - 49);
+    ctx.font = '11px Consolas, monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('Macon, GA / HOME', x + 34, y - 33);
+    ctx.restore();
   }
 
   destroy() {

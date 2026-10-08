@@ -4,7 +4,8 @@
   "description": "Middle Georgia State University - Cyber Threat Simulator",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test tests/*.test.js"
   },
   "keywords": [
     "threat-sim",

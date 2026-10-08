@@ -31,6 +31,11 @@ class GlobeRenderer {
     this.createAtmosphere();
     this.createCountryBorders();
     this.createCityMarkers();
+    this.homeLabel = document.createElement('div');
+    this.homeLabel.className = 'mga-map-marker';
+    this.homeLabel.innerHTML = '<i></i><strong>MGA MAIN CAMPUS</strong><span>Macon, GA · HOME</span>';
+    this.container.appendChild(this.homeLabel);
+    this.homePosition = this.latLonToVector3(worldData.home.lat, worldData.home.lon, this.radius * 1.006);
     this.setupInteractivity();
     this.animate = this.animate.bind(this);
     requestAnimationFrame(this.animate);
@@ -580,9 +585,17 @@ class GlobeRenderer {
     }
 
     this.renderer.render(this.scene, this.camera);
+    const home = this.homePosition.clone().applyMatrix4(this.globeGroup.matrixWorld);
+    const normal = home.clone().sub(this.globeGroup.position).normalize();
+    const facingCamera = normal.dot(this.camera.position.clone().sub(home)) > 0;
+    const screen = home.project(this.camera);
+    this.homeLabel.hidden = !facingCamera || Math.abs(screen.x) > 1 || Math.abs(screen.y) > 1 || screen.z > 1;
+    this.homeLabel.style.left = `${(screen.x + 1) * .5 * this.container.clientWidth}px`;
+    this.homeLabel.style.top = `${(1 - screen.y) * .5 * this.container.clientHeight}px`;
   }
 
   destroy() {
+    this.homeLabel.remove();
     if (this.renderer && this.renderer.domElement) {
       this.container.removeChild(this.renderer.domElement);
       this.renderer.dispose();

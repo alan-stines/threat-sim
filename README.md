@@ -61,6 +61,30 @@ You can also open `index.html` directly in your browser.
 
 ## ⚡ Key Features
 
+The globe starts centered on MGA's Macon campus with rotation off. A persistent
+**MGA MAIN CAMPUS / Macon, GA** home marker appears in both projections; **FOCUS
+MGA** returns to the campus-centered globe. The simulated US/MGA node uses the
+same approximate campus coordinates (32.808, -83.734), rather than Washington,
+D.C. Country counters remain simulated national aggregates, not campus telemetry.
+Location reference: [Macon campus imagery](https://commons.wikimedia.org/wiki/File:Police_car,_Middle_Georgia_State_University_Macon_campus.jpg).
+
+### MGA campus defense exercise
+
+Select **MGA CAMPUS** in the header, or open `http://localhost:3000/?mode=campus`.
+This fictional, offline teaching network shows campus email, identity, the student
+portal, research files, Wi-Fi, and an isolated backup vault. It does not represent
+MGA's actual infrastructure or connect to any campus services.
+
+**Run scenario** plays a repeatable 90-second ransomware incident: phishing,
+account compromise, lateral movement, encryption, containment, and recovery.
+Each stage updates service status and includes a defender response and discussion
+prompt. **Pause / Resume**, **Next stage**, **Reset**, and **Replay scenario** support
+instructor-led demonstrations. Recovery time is compressed for teaching.
+
+The global simulation pauses while campus mode is open and resumes with its
+previous speed when you return. Leaving campus mode pauses the exercise; reopening
+it preserves your place. Run `npm test` to check scenario timing and controls.
+
 1. **Dual Visual Projections**:
    - **3D Holographic Globe**: Powered by Three.js with vector country borders, atmospheric Fresnel glow, starry space backdrop, and smooth orbit controls (pan, zoom, auto-rotate).
    - **2D Tactical Map**: High-performance Canvas 2D projection with coordinate grid, neon coastlines, and radar sweep. Switchable with a single click.
